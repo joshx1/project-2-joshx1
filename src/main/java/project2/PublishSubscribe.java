@@ -1,4 +1,4 @@
-package main.java.project2;
+package project2;
 
 import java.util.concurrent.ExecutorService;
 import java.util.ArrayList;

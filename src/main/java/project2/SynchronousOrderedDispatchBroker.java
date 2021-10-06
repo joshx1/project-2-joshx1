@@ -1,4 +1,4 @@
-package main.java.project2;
+package project2;
 
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReadWriteLock;

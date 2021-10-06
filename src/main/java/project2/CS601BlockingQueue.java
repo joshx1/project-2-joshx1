@@ -1,4 +1,4 @@
-package main.java.project2;
+package project2;
 
 public class CS601BlockingQueue<T> {
 

@@ -1,4 +1,4 @@
-package main.java.project2;
+package project2;
 import com.google.gson.Gson;
 
 import java.io.*;

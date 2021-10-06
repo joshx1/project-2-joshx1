@@ -1,4 +1,4 @@
-package main.java.project2;
+package project2;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -66,12 +66,13 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
 
     @Override
     public void publish(T item) {
-        running = true;
-        readLock.lock();
-        try {
-            blockingQueue.put(item);
-        } finally {
-            readLock.unlock();
+        if (running == true) {
+            readLock.lock();
+            try {
+                blockingQueue.put(item);
+            } finally {
+                readLock.unlock();
+            }
         }
     }
 
