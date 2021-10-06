@@ -10,9 +10,10 @@ import java.util.concurrent.TimeUnit;
 // ASyncOrdered - bounded blocking queue
 public class PublishSubscribe {
     public static void main(String[] args) {
-        SubscriberOld <String> subscriber1 = new SubscriberOld<>();
-        SubscriberOld <String> subscriber2 = new SubscriberOld<>();
-        SubscriberOld <String> subscriber3 = new SubscriberOld<>();
+        String outputFileName = "KitchenOld.json";
+        SubscriberOld <String> subscriber1 = new SubscriberOld<>(outputFileName);
+        SubscriberOld <String> subscriber2 = new SubscriberOld<>(outputFileName);
+        SubscriberOld <String> subscriber3 = new SubscriberOld<>(outputFileName);
         //SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker(new ArrayList<>());
         AsyncUnorderedDispatchBroker broker = new AsyncUnorderedDispatchBroker(new ArrayList<>());
         //AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker(new ArrayList<>());

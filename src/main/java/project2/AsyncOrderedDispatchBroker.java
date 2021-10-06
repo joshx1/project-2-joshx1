@@ -35,7 +35,7 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
                 while (running == true || blockingQueue.isEmpty() == false) {
                     //while (running == true) {
                     T item = blockingQueue.poll();
-                    System.out.println("polled");
+                    System.out.println("asdfd");
                     if (item != null) {
                         subscriberList.forEach((subscriber) -> subscriber.onEvent(item));
                     }
