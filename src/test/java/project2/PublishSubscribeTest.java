@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
@@ -13,12 +16,139 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PublishSubscribeTest {
-    SubscriberOld<String> subscriber1 = new SubscriberOld<>();
-    SubscriberOld<String> subscriber2 = new SubscriberOld<>();
-    SubscriberOld<String> subscriber3 = new SubscriberOld<>();
+    String outputFileName1 = "KitchenOld1.json";
+    String outputFileName2 = "KitchenOld2.json";
+    String outputFileName3 = "KitchenOld3.json";
+    SubscriberOld<String> subscriber1 = new SubscriberOld<>(outputFileName1);
+    SubscriberOld<String> subscriber2 = new SubscriberOld<>(outputFileName2);
+    SubscriberOld<String> subscriber3 = new SubscriberOld<>(outputFileName3);
     SynchronousOrderedDispatchBroker syncBroker = new SynchronousOrderedDispatchBroker(new ArrayList<>());
     AsyncUnorderedDispatchBroker asyncUnordBroker = new AsyncUnorderedDispatchBroker(new ArrayList<>());
     AsyncOrderedDispatchBroker asyncOrdBroker = new AsyncOrderedDispatchBroker(new ArrayList<>());
+
+    //@RepeatedTest(100)
+    @Test
+    public void synctestpublisherthreads() {
+        syncBroker.subscribe(subscriber1);
+        syncBroker.subscribe(subscriber2);
+        syncBroker.subscribe(subscriber3);
+        Thread publisherThread1 = new Thread(){
+            public void run(){
+                Publisher publisher1 = null;
+                try {
+                    publisher1 = new Publisher("reviews_Home_and_Kitchen_5.json");
+                } catch (UnsupportedEncodingException exc) {
+                    exc.printStackTrace();
+                } catch (FileNotFoundException exc) {
+                    exc.printStackTrace();
+                }
+                try {
+                    publisher1.callPublish(syncBroker);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        //Thread publisherThread2 = new Thread(){
+        //    public void run(){
+        //        Publisher publisher2 = null;
+        //        try {
+        //            publisher2 = new Publisher("reviews_Home_and_Kitchen_5.json");
+        //        } catch (UnsupportedEncodingException exc) {
+        //            exc.printStackTrace();
+        //        } catch (FileNotFoundException exc) {
+        //            exc.printStackTrace();
+        //        }
+        //        try {
+        //            publisher2.callPublish(syncBroker);
+        //        } catch (IOException e) {
+        //            e.printStackTrace();
+        //        }
+        //    }
+        //};
+        publisherThread1.start();
+        //publisherThread2.start();
+        try {
+            publisherThread1.join(10000000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //try {
+        //    publisherThread2.join(10000000);
+        //} catch (InterruptedException e) {
+        //    e.printStackTrace();
+        //}
+        syncBroker.shutdown();
+        ArrayList inbox1 = subscriber1.getInbox();
+        ArrayList inbox2 = subscriber2.getInbox();
+        ArrayList inbox3 = subscriber3.getInbox();
+    }
+
+    @RepeatedTest(100)
+    public void asynctestpublisherthreads() {
+        syncBroker.subscribe(subscriber1);
+        syncBroker.subscribe(subscriber2);
+        syncBroker.subscribe(subscriber3);
+        Thread publisherThread1 = new Thread(){
+            public void run(){
+                Publisher publisher1 = null;
+                try {
+                    publisher1 = new Publisher("reviews_Home_and_Kitchen_5.json");
+                } catch (UnsupportedEncodingException exc) {
+                    exc.printStackTrace();
+                } catch (FileNotFoundException exc) {
+                    exc.printStackTrace();
+                }
+                try {
+                    publisher1.callPublish(syncBroker);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Thread publisherThread2 = new Thread(){
+            public void run(){
+                Publisher publisher2 = null;
+                try {
+                    publisher2 = new Publisher("reviews_Home_and_Kitchen_5.json");
+                } catch (UnsupportedEncodingException exc) {
+                    exc.printStackTrace();
+                } catch (FileNotFoundException exc) {
+                    exc.printStackTrace();
+                }
+                try {
+                    publisher2.callPublish(syncBroker);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        publisherThread1.start();
+        publisherThread2.start();
+        try {
+            publisherThread1.join(10000000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            publisherThread2.join(10000000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        syncBroker.shutdown();
+        ArrayList inbox1 = subscriber1.getInbox();
+        ArrayList inbox2 = subscriber2.getInbox();
+        ArrayList inbox3 = subscriber3.getInbox();
+        System.out.println(inbox1.get(0));
+        System.out.println(inbox2.get(0));
+        System.out.println(inbox1.size());
+        System.out.println(inbox2.size());
+        System.out.println(inbox3.size());
+    }
 
     @RepeatedTest(100)
     public void synctest() {
