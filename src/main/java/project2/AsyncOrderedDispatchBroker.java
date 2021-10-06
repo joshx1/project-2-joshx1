@@ -32,9 +32,10 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
         mailer.execute(new Runnable() {
             @Override
             public void run() {
-                while (running == true) {
+                while (running == true || blockingQueue.isEmpty() == false) {
+                    //while (running == true) {
                     T item = blockingQueue.poll();
-                    //System.out.println("polled");
+                    System.out.println("polled");
                     if (item != null) {
                         subscriberList.forEach((subscriber) -> subscriber.onEvent(item));
                     }
@@ -66,13 +67,12 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
 
     @Override
     public void publish(T item) {
-        if (running == true) {
-            readLock.lock();
-            try {
-                blockingQueue.put(item);
-            } finally {
-                readLock.unlock();
-            }
+        running = true;
+        readLock.lock();
+        try {
+            blockingQueue.put(item);
+        } finally {
+            readLock.unlock();
         }
     }
 
