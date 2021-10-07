@@ -10,15 +10,15 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PublishSubscribeTest {
-    String outputFileName1 = "KitchenOld1.json";
-    String outputFileName2 = "KitchenOld2.json";
-    String outputFileName3 = "KitchenOld3.json";
-    SubscriberOld<String> subscriber1 = new SubscriberOld<>(outputFileName1);
-    SubscriberOld<String> subscriber2 = new SubscriberOld<>(outputFileName2);
-    SubscriberOld<String> subscriber3 = new SubscriberOld<>(outputFileName3);
-    SynchronousOrderedDispatchBroker syncBroker = new SynchronousOrderedDispatchBroker(new ArrayList<>());
-    AsyncUnorderedDispatchBroker asyncUnordBroker = new AsyncUnorderedDispatchBroker(new ArrayList<>());
-    AsyncOrderedDispatchBroker asyncOrdBroker = new AsyncOrderedDispatchBroker(new ArrayList<>());
+    //String outputFileName1 = "KitchenOld1.json";
+    //String outputFileName2 = "KitchenOld2.json";
+    //String outputFileName3 = "KitchenOld3.json";
+    //SubscriberOld<String> subscriber1 = new SubscriberOld<>(outputFileName1);
+    //SubscriberOld<String> subscriber2 = new SubscriberOld<>(outputFileName2);
+    //SubscriberOld<String> subscriber3 = new SubscriberOld<>(outputFileName3);
+    //SynchronousOrderedDispatchBroker syncBroker = new SynchronousOrderedDispatchBroker(new ArrayList<>());
+    //AsyncUnorderedDispatchBroker asyncUnordBroker = new AsyncUnorderedDispatchBroker(new ArrayList<>());
+    //AsyncOrderedDispatchBroker asyncOrdBroker = new AsyncOrderedDispatchBroker(new ArrayList<>());
     private java.io.FileInputStream fileInputNew1;
     private java.io.InputStreamReader inputStreamNew1;
     private java.io.FileInputStream fileInputNew2;
@@ -181,130 +181,130 @@ class PublishSubscribeTest {
         assertEquals(774871, newLineCount);
     }
 
-    @Test
-    public void asynctestpublisherthreads() {
-        final long startTime = System.currentTimeMillis();
-        asyncOrdBroker.subscribe(subscriber1);
-        asyncOrdBroker.subscribe(subscriber2);
-        asyncOrdBroker.subscribe(subscriber3);
-        Thread publisherThread1 = new Thread() {
-            public void run() {
-                Publisher publisher1 = null;
-                try {
-                    publisher1 = new Publisher("reviews_Home_and_Kitchen_5.json");
-                } catch (UnsupportedEncodingException exc) {
-                    exc.printStackTrace();
-                } catch (FileNotFoundException exc) {
-                    exc.printStackTrace();
-                }
-                try {
-                    publisher1.callPublish(asyncOrdBroker);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+    //@Test
+    //public void asynctestpublisherthreads() {
+    //    final long startTime = System.currentTimeMillis();
+    //    asyncOrdBroker.subscribe(subscriber1);
+    //    asyncOrdBroker.subscribe(subscriber2);
+    //    asyncOrdBroker.subscribe(subscriber3);
+    //    Thread publisherThread1 = new Thread() {
+    //        public void run() {
+    //            Publisher publisher1 = null;
+    //            try {
+    //                publisher1 = new Publisher("reviews_Home_and_Kitchen_5.json");
+    //            } catch (UnsupportedEncodingException exc) {
+    //                exc.printStackTrace();
+    //            } catch (FileNotFoundException exc) {
+    //                exc.printStackTrace();
+    //            }
+    //            try {
+    //                publisher1.callPublish(asyncOrdBroker);
+    //            } catch (IOException e) {
+    //                e.printStackTrace();
+    //            }
+    //        }
+    //    };
 
-        Thread publisherThread2 = new Thread() {
-            public void run() {
-                Publisher publisher2 = null;
-                try {
-                    publisher2 = new Publisher("reviews_Apps_for_Android_5.json");
-                } catch (UnsupportedEncodingException exc) {
-                    exc.printStackTrace();
-                } catch (FileNotFoundException exc) {
-                    exc.printStackTrace();
-                }
-                try {
-                    publisher2.callPublish(asyncOrdBroker);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        publisherThread1.start();
-        publisherThread2.start();
-        try {
-            publisherThread1.join(10000000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    //    Thread publisherThread2 = new Thread() {
+    //        public void run() {
+    //            Publisher publisher2 = null;
+    //            try {
+    //                publisher2 = new Publisher("reviews_Apps_for_Android_5.json");
+    //            } catch (UnsupportedEncodingException exc) {
+    //                exc.printStackTrace();
+    //            } catch (FileNotFoundException exc) {
+    //                exc.printStackTrace();
+    //            }
+    //            try {
+    //                publisher2.callPublish(asyncOrdBroker);
+    //            } catch (IOException e) {
+    //                e.printStackTrace();
+    //            }
+    //        }
+    //    };
+    //    publisherThread1.start();
+    //    publisherThread2.start();
+    //    try {
+    //        publisherThread1.join(10000000);
+    //    } catch (InterruptedException e) {
+    //        e.printStackTrace();
+    //    }
 
-        try {
-            publisherThread2.join(10000000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        asyncOrdBroker.shutdown();
-        subscriber1.shutdown();
-        subscriber2.shutdown();
-        subscriber3.shutdown();
-        final long endTime = System.currentTimeMillis();
-        System.out.println("Total execution time: " + (endTime - startTime));
-    }
+    //    try {
+    //        publisherThread2.join(10000000);
+    //    } catch (InterruptedException e) {
+    //        e.printStackTrace();
+    //    }
+    //    asyncOrdBroker.shutdown();
+    //    subscriber1.shutdown();
+    //    subscriber2.shutdown();
+    //    subscriber3.shutdown();
+    //    final long endTime = System.currentTimeMillis();
+    //    System.out.println("Total execution time: " + (endTime - startTime));
+    //}
 
-    //@RepeatedTest(100)
-    @Test
-    public void synctestpublisherthreads() {
-        final long startTime = System.currentTimeMillis();
-        syncBroker.subscribe(subscriber1);
-        syncBroker.subscribe(subscriber2);
-        syncBroker.subscribe(subscriber3);
-        Thread publisherThread1 = new Thread() {
-            public void run() {
-                Publisher publisher1 = null;
-                try {
-                    publisher1 = new Publisher("reviews_Home_and_Kitchen_5.json");
-                } catch (UnsupportedEncodingException exc) {
-                    exc.printStackTrace();
-                } catch (FileNotFoundException exc) {
-                    exc.printStackTrace();
-                }
-                try {
-                    publisher1.callPublish(syncBroker);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+    ////@RepeatedTest(100)
+    //@Test
+    //public void synctestpublisherthreads() {
+    //    final long startTime = System.currentTimeMillis();
+    //    syncBroker.subscribe(subscriber1);
+    //    syncBroker.subscribe(subscriber2);
+    //    syncBroker.subscribe(subscriber3);
+    //    Thread publisherThread1 = new Thread() {
+    //        public void run() {
+    //            Publisher publisher1 = null;
+    //            try {
+    //                publisher1 = new Publisher("reviews_Home_and_Kitchen_5.json");
+    //            } catch (UnsupportedEncodingException exc) {
+    //                exc.printStackTrace();
+    //            } catch (FileNotFoundException exc) {
+    //                exc.printStackTrace();
+    //            }
+    //            try {
+    //                publisher1.callPublish(syncBroker);
+    //            } catch (IOException e) {
+    //                e.printStackTrace();
+    //            }
+    //        }
+    //    };
 
-        Thread publisherThread2 = new Thread(){
-            public void run() {
-                Publisher publisher2 = null;
-                try {
-                    publisher2 = new Publisher("reviews_Apps_for_Android_5.json");
-                } catch (UnsupportedEncodingException exc) {
-                    exc.printStackTrace();
-                } catch (FileNotFoundException exc) {
-                    exc.printStackTrace();
-                }
-                try {
-                    publisher2.callPublish(syncBroker);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        publisherThread1.start();
-        publisherThread2.start();
-        try {
-            publisherThread1.join(10000000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    //    Thread publisherThread2 = new Thread(){
+    //        public void run() {
+    //            Publisher publisher2 = null;
+    //            try {
+    //                publisher2 = new Publisher("reviews_Apps_for_Android_5.json");
+    //            } catch (UnsupportedEncodingException exc) {
+    //                exc.printStackTrace();
+    //            } catch (FileNotFoundException exc) {
+    //                exc.printStackTrace();
+    //            }
+    //            try {
+    //                publisher2.callPublish(syncBroker);
+    //            } catch (IOException e) {
+    //                e.printStackTrace();
+    //            }
+    //        }
+    //    };
+    //    publisherThread1.start();
+    //    publisherThread2.start();
+    //    try {
+    //        publisherThread1.join(10000000);
+    //    } catch (InterruptedException e) {
+    //        e.printStackTrace();
+    //    }
 
-        try {
-            publisherThread2.join(10000000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        syncBroker.shutdown();
-        subscriber1.shutdown();
-        subscriber2.shutdown();
-        subscriber3.shutdown();
-        final long endTime = System.currentTimeMillis();
-        System.out.println("Total execution time: " + (endTime - startTime));
-    }
+    //    try {
+    //        publisherThread2.join(10000000);
+    //    } catch (InterruptedException e) {
+    //        e.printStackTrace();
+    //    }
+    //    syncBroker.shutdown();
+    //    subscriber1.shutdown();
+    //    subscriber2.shutdown();
+    //    subscriber3.shutdown();
+    //    final long endTime = System.currentTimeMillis();
+    //    System.out.println("Total execution time: " + (endTime - startTime));
+    //}
 
     //@RepeatedTest(100)
     //public void asynctestpublisherthreads() {

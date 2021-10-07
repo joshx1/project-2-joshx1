@@ -25,7 +25,7 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
-    CS601BlockingQueue <T> blockingQueue = new CS601BlockingQueue(30);
+    CS601BlockingQueue <T> blockingQueue = new CS601BlockingQueue(10);
     ExecutorService mailer = Executors.newSingleThreadExecutor();
 
     /**

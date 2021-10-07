@@ -14,7 +14,7 @@ public class ReviewInputs {
     private String unixReviewTime;
     private String reviewTime;
 
-    // Constructor for ReviewInputs with all the fields in the Reviews JSON file.
+    // Constructor for ReviewInputs with all the fields in the Amazon reviews JSON file.
     public ReviewInputs(String reviewerID, String asin, String reviewerName, ArrayList helpful, String reviewText, String overall, String summary, String unixReviewTime, String reviewTime) {
         this.reviewerID = reviewerID;
         this.asin = asin;
