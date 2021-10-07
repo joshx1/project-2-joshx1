@@ -3,11 +3,7 @@ package project2;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.concurrent.ExecutorService;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 // SyncOrdered - iterate and call onEvent
 // aSyncUnordered - pool

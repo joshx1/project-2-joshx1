@@ -4,11 +4,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -25,8 +24,16 @@ class PublishSubscribeTest {
     SynchronousOrderedDispatchBroker syncBroker = new SynchronousOrderedDispatchBroker(new ArrayList<>());
     AsyncUnorderedDispatchBroker asyncUnordBroker = new AsyncUnorderedDispatchBroker(new ArrayList<>());
     AsyncOrderedDispatchBroker asyncOrdBroker = new AsyncOrderedDispatchBroker(new ArrayList<>());
+    private java.io.FileInputStream fileInputNew1;
+    private java.io.InputStreamReader inputStreamNew1;
+    private java.io.FileInputStream fileInputNew2;
+    private java.io.InputStreamReader inputStreamNew2;
+    private java.io.FileInputStream fileInputOld1;
+    private java.io.InputStreamReader inputStreamOld1;
+    private java.io.FileInputStream fileInputOld2;
+    private java.io.InputStreamReader inputStreamOld2;
 
-    @Test
+    @RepeatedTest(100)
     public void maintest() {
         String[] args = {"-config", "config.json"};
         final long startTime = System.currentTimeMillis();
@@ -34,6 +41,148 @@ class PublishSubscribeTest {
         publishSubscribe.main(args);
         final long endTime = System.currentTimeMillis();
         System.out.println("Total execution time: " + (endTime - startTime));
+
+        try {
+            fileInputNew1 = new FileInputStream("reviewsNew1.json");
+            inputStreamNew1 = new InputStreamReader(fileInputNew1, "ISO-8859-1");
+            fileInputNew2 = new FileInputStream("reviewsNew2.json");
+            inputStreamNew2 = new InputStreamReader(fileInputNew2, "ISO-8859-1");
+            fileInputOld1 = new FileInputStream("reviewsOld1.json");
+            inputStreamOld1 = new InputStreamReader(fileInputOld1, "ISO-8859-1");
+            fileInputOld2 = new FileInputStream("reviewsOld2.json");
+            inputStreamOld2 = new InputStreamReader(fileInputOld2, "ISO-8859-1");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String line1 = "";
+        String line2 = "";
+        int oldLineCount = 0;
+        try (BufferedReader bufferedReaderOld1 = new BufferedReader(inputStreamOld1);
+             BufferedReader bufferedReaderOld2 = new BufferedReader(inputStreamOld2)) {
+            while (line1 != null && line2 != null) {
+                line1 = bufferedReaderOld1.readLine();
+                line2 = bufferedReaderOld2.readLine();
+                if (line1 != null && line2 != null) {
+                    assertTrue(line1.equals(line2));
+                    oldLineCount++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertEquals(529748, oldLineCount);
+        int newLineCount = 0;
+        line1 = "";
+        line2 = "";
+        try (BufferedReader bufferedReaderNew1 = new BufferedReader(inputStreamNew1);
+             BufferedReader bufferedReaderNew2 = new BufferedReader(inputStreamNew2)) {
+            while (line1 != null && line2 != null) {
+                line1 = bufferedReaderNew1.readLine();
+                line2 = bufferedReaderNew2.readLine();
+                if (line1 != null && line2 != null) {
+                    assertTrue(line1.equals(line2));
+                    newLineCount++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertEquals(774871, newLineCount);
+    }
+
+    @Test
+    public void maintestasync() {
+        String[] args = {"-config", "config.json"};
+        final long startTime = System.currentTimeMillis();
+        PublishSubscribe publishSubscribe = null;
+        publishSubscribe.main(args);
+        final long endTime = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (endTime - startTime));
+        System.exit(1);
+        try {
+            fileInputNew1 = new FileInputStream("reviewsNew1.json");
+            inputStreamNew1 = new InputStreamReader(fileInputNew1, "ISO-8859-1");
+            fileInputNew2 = new FileInputStream("reviewsNew2.json");
+            inputStreamNew2 = new InputStreamReader(fileInputNew2, "ISO-8859-1");
+            fileInputOld1 = new FileInputStream("reviewsOld1.json");
+            inputStreamOld1 = new InputStreamReader(fileInputOld1, "ISO-8859-1");
+            fileInputOld2 = new FileInputStream("reviewsOld2.json");
+            inputStreamOld2 = new InputStreamReader(fileInputOld2, "ISO-8859-1");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String line = "";
+        //HashMap<String, Integer> reviewMapOld = new HashMap<>();
+        //int oldLineCount = 0;
+        //try (BufferedReader bufferedReaderOld1 = new BufferedReader(inputStreamOld1)) {
+        //    while (line != null) {
+        //        line = bufferedReaderOld1.readLine();
+        //        if (line != null) {
+        //            reviewMapOld.put(line, reviewMapOld.getOrDefault(line, 0) + 1);
+        //            oldLineCount++;
+        //        }
+        //    }
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
+        //assertEquals(529748, oldLineCount);
+
+        //line = "";
+        //oldLineCount = 0;
+        //try (BufferedReader bufferedReaderOld2 = new BufferedReader(inputStreamOld2)) {
+        //    while (line != null) {
+        //        line = bufferedReaderOld2.readLine();
+        //        if (line != null) {
+        //            reviewMapOld.put(line, reviewMapOld.getOrDefault(line, 0) + 1);
+        //            oldLineCount++;
+        //        }
+        //    }
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
+        //for (HashMap.Entry<String, Integer> entry: reviewMapOld.entrySet()) {
+        //    int count = entry.getValue();
+        //    assertEquals(2, count);
+        //}
+        //assertEquals(529748, oldLineCount);
+
+        line = "";
+        int newLineCount = 0;
+        HashMap<String, Integer> reviewMapNew = new HashMap<>();
+        try (BufferedReader bufferedReaderNew1 = new BufferedReader(inputStreamNew1)) {
+            while (line != null) {
+                line = bufferedReaderNew1.readLine();
+                if (line != null) {
+                    reviewMapNew.put(line, reviewMapNew.getOrDefault(line, 0) + 1);
+                    newLineCount++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertEquals(774871, newLineCount);
+
+        line = "";
+        try (BufferedReader bufferedReaderNew2 = new BufferedReader(inputStreamNew2)) {
+            while (line != null) {
+                line = bufferedReaderNew2.readLine();
+                if (line != null) {
+                    reviewMapNew.put(line, reviewMapNew.getOrDefault(line, 0) + 1);
+                    newLineCount++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (HashMap.Entry<String, Integer> entry: reviewMapNew.entrySet()) {
+            int count = entry.getValue();
+            assertEquals(2, count);
+        }
+        assertEquals(774871, newLineCount);
     }
 
     @Test

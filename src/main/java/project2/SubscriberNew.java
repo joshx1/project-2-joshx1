@@ -49,11 +49,4 @@ public class SubscriberNew <T> implements Subscriber <T>{
             e.printStackTrace();
         }
     }
-    public synchronized ArrayList getInbox() {
-        return inbox;
-    }
-    public synchronized void printInbox() {
-        System.out.println(inbox.toString());
-        System.out.println(inbox.size());
-    }
 }
