@@ -1,17 +1,11 @@
 package project2;
 
-import com.google.gson.Gson;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,10 +29,10 @@ class PublishSubscribeTest {
     private java.io.InputStreamReader inputStreamOld2;
 
     @RepeatedTest(100)
-    public void maintest() {
+    public void orderedmaintest() {
         String[] args = {"-config", "config.json"};
         final long startTime = System.currentTimeMillis();
-        PublishSubscribe publishSubscribe = null;
+        AmazonPublishSubscribe publishSubscribe = null;
         publishSubscribe.main(args);
         final long endTime = System.currentTimeMillis();
         System.out.println("Total execution time: " + (endTime - startTime));
@@ -93,12 +87,12 @@ class PublishSubscribeTest {
         assertEquals(774871, newLineCount);
     }
 
-    //@RepeatedTest(100)
-    @Test
-    public void maintestasync() {
+    @RepeatedTest(100)
+    //@Test
+    public void unorderedmaintest() {
         String[] args = {"-config", "config.json"};
         final long startTime = System.currentTimeMillis();
-        PublishSubscribe publishSubscribe = null;
+        AmazonPublishSubscribe publishSubscribe = null;
         publishSubscribe.main(args);
         final long endTime = System.currentTimeMillis();
         System.out.println("Total execution time: " + (endTime - startTime));
@@ -117,7 +111,6 @@ class PublishSubscribeTest {
             e.printStackTrace();
         }
 
-        Gson gson = new Gson();
         String line = "";
         HashMap<String, Integer> reviewMapOld = new HashMap<>();
         int oldLineCount = 0;
@@ -125,8 +118,7 @@ class PublishSubscribeTest {
             while (line != null) {
                 line = bufferedReaderOld1.readLine();
                 if (line != null) {
-                    ReviewInputs reviewInputs= gson.fromJson(String.valueOf(line), ReviewInputs.class);
-                    reviewMapOld.put(reviewInputs.getAsin(), reviewMapOld.getOrDefault(reviewInputs.getAsin(), 0) + 1);
+                    reviewMapOld.put(line, reviewMapOld.getOrDefault(line, 0) + 1);
                     oldLineCount++;
                 }
             }
@@ -135,15 +127,13 @@ class PublishSubscribeTest {
         }
         assertEquals(529748, oldLineCount);
 
-        HashMap<String, Integer> reviewMapOld2 = new HashMap<>();
         line = "";
         oldLineCount = 0;
         try (BufferedReader bufferedReaderOld2 = new BufferedReader(inputStreamOld2)) {
             while (line != null) {
                 line = bufferedReaderOld2.readLine();
                 if (line != null) {
-                    ReviewInputs reviewInputs= gson.fromJson(String.valueOf(line), ReviewInputs.class);
-                    reviewMapOld2.put(reviewInputs.getAsin(), reviewMapOld2.getOrDefault(reviewInputs.getAsin(), 0) + 1);
+                    reviewMapOld.put(line, reviewMapOld.getOrDefault(line, 0) + 1);
                     oldLineCount++;
                 }
             }
@@ -151,11 +141,11 @@ class PublishSubscribeTest {
             e.printStackTrace();
         }
         for (HashMap.Entry<String, Integer> entry: reviewMapOld.entrySet()) {
-            String asin = entry.getKey();
-            assert(reviewMapOld.get(asin).equals(reviewMapOld2.get(asin)));
+            String count = entry.getKey();
+            assertEquals(2, reviewMapOld.get(count));
         }
         assertEquals(529748, oldLineCount);
-        //System.exit(1);
+
         line = "";
         int newLineCount = 0;
         HashMap<String, Integer> reviewMapNew = new HashMap<>();

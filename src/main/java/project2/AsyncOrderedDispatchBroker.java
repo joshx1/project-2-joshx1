@@ -25,15 +25,10 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
     public AsyncOrderedDispatchBroker(ArrayList<Subscriber> subscriberList) {
         this.subscriberList = subscriberList;
         CS601BlockingQueue<T> blockingQueue = this.blockingQueue;
-        //Runnable runnable = new MailToSubscribers<>(subscriberList, blockingQueue);
-        //Thread thread = new Thread(runnable, "Mailer");
-        //thread.start();
-        //mailer.execute();
         mailer.execute(new Runnable() {
             @Override
             public void run() {
                 while (running == true || blockingQueue.isEmpty() == false) {
-                    //while (running == true) {
                     T item = blockingQueue.poll();
                     if (item != null) {
                         subscriberList.forEach((subscriber) -> subscriber.onEvent(item));
@@ -41,27 +36,6 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
                 }
             }
         });
-
-        //mailer.execute(new Runnable() {
-        //    @Override
-        //    public void run() {
-        //        System.out.println("ran the poll");
-        //        while (running == true) {
-        //            while (blockingQueue.isEmpty() == false) {
-        //                T item = blockingQueue.poll();
-        //                //subscriberList.forEach((subscriber) -> subscriber.onEvent(item));
-        //                if (item != null) {
-        //                    for (int k = 0; k < subscriberList.size(); k++) {
-        //                        //System.out.println(k);
-        //                        Subscriber subscriber = subscriberList.get(k);
-        //                        subscriber.onEvent(item);
-        //                        //logger.info(String.valueOf(subscriber));
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //});
     }
 
     @Override
@@ -96,6 +70,5 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("all threads finished");
     }
 }

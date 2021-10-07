@@ -41,7 +41,6 @@ public class CS601BlockingQueue<T> {
         }
     }
 
-
     public synchronized T take() {
         while(size == 0) {
             try {
@@ -62,7 +61,6 @@ public class CS601BlockingQueue<T> {
         if(size == items.length-1) {
             this.notifyAll();
         }
-
         return item;
     }
 
@@ -71,7 +69,7 @@ public class CS601BlockingQueue<T> {
         if (size == 0) {
             //System.out.println("returned null");
             try {
-                this.wait(10);
+                this.wait(1000);
                     if (size != 0) {
                         flag = true;
                     }

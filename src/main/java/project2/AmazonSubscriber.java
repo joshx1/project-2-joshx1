@@ -5,17 +5,19 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.util.ArrayList;
 
-public class SubscriberNew <T> implements Subscriber <T>{
+public class AmazonSubscriber<T> implements Subscriber <T>{
 
     private ArrayList<T> inbox;
     private int UNIX_REVIEW_TIME_SPLIT = 1362268800;
     Gson gson = new Gson();
     BufferedWriter bufferedWriter;
     private String outputFileName;
+    String oldOrNew;
 
-    public SubscriberNew(String outputFileName) {
+    public AmazonSubscriber(String outputFileName, String oldOrNew) {
         this.inbox = new ArrayList<T>();
         this.outputFileName =  outputFileName;
+        this.oldOrNew = oldOrNew;
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(outputFileName);
             OutputStreamWriter outputStream = new java.io.OutputStreamWriter(fileOutputStream, "ISO-8859-1");
@@ -32,12 +34,23 @@ public class SubscriberNew <T> implements Subscriber <T>{
         //inbox.add(item);
         ReviewInputs reviewInputs = gson.fromJson(String.valueOf(item), ReviewInputs.class);
         int time = Integer.parseInt(reviewInputs.getUnixReviewTime());
-        if (time >= UNIX_REVIEW_TIME_SPLIT) {
-            try {
-                bufferedWriter.write(String.valueOf(item));
-                bufferedWriter.newLine();
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (oldOrNew.equals("NEW")) {
+            if (time >= UNIX_REVIEW_TIME_SPLIT) {
+                try {
+                    bufferedWriter.write(String.valueOf(item));
+                    bufferedWriter.newLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (oldOrNew.equals("OLD")) {
+            if (time < UNIX_REVIEW_TIME_SPLIT) {
+                try {
+                    bufferedWriter.write(String.valueOf(item));
+                    bufferedWriter.newLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

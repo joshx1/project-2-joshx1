@@ -27,7 +27,6 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
 
     @Override
     public void publish(T item) {
-        //threadPool.execute(new MailToSubscribers<>(subscriberList));
         threadPool.execute(new Runnable() {
             @Override
             public void run() {
@@ -35,7 +34,6 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
                 try {
                     //subscriberList.forEach((subscriber) -> subscriber.onEvent(item));
                     for (int k = 0; k < subscriberList.size(); k++) {
-                        //System.out.println(k);
                         Subscriber subscriber = subscriberList.get(k);
                         synchronized (subscriber) {
                             subscriber.onEvent(item);
@@ -53,7 +51,6 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
         writeLock.lock();
         try {
             subscriberList.add(subscriber);
-            //System.out.println(subscriberList.toString());
         } finally {
             writeLock.unlock();
         }
@@ -61,14 +58,11 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
 
     @Override
     public void shutdown() {
-        //System.out.println("Shutting down!");
         threadPool.shutdown();
         try {
             threadPool.awaitTermination(10, TimeUnit.HOURS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //System.out.println("all threads finished");
-
     }
 }

@@ -6,13 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.*;
 
+/**
+ * The class ReadConfigSettings
+ */
 public class ReadConfigSettings {
-    /**
-     * The method extractFileName
-     *
-     * @param args
-     * @return
-     */
 
     private java.io.FileInputStream fileInput;
     private java.io.InputStreamReader inputStream;
