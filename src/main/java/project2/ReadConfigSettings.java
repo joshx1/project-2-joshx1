@@ -2,12 +2,11 @@ package project2;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.io.*;
 
 /**
- * The class ReadConfigSettings
+ * The class ReadConfigSettings is responsible for taking the file from the command line arguments and returning the
+ * configuration settings stored there.
  */
 public class ReadConfigSettings {
 
@@ -15,10 +14,18 @@ public class ReadConfigSettings {
     private java.io.InputStreamReader inputStream;
     private String[] args;
 
+    /**
+     * The constructor method for ReadConfigSettings.
+     * @param args
+     */
     public ReadConfigSettings(String[] args) {
         this.args = args;
     }
 
+    /**
+     * The extractConfigSettings method reads the config file given by the command line and returns settings.
+     * @return
+     */
     public ConfigInputs extractConfigSettings() {
         String configFileName = null;
         if (args.length == 2) {
@@ -37,20 +44,22 @@ public class ReadConfigSettings {
             fileInput = new FileInputStream(configFileName);
             inputStream = new InputStreamReader(fileInput, "ISO-8859-1");
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Problem with accessing the config file.");
+            System.exit(1);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            System.out.println("Problem with accessing the config file.");
+            System.exit(1);
         }
         String configSettingsLine = null;
         ConfigInputs configInputs = null;
-        List<String> settings = new ArrayList<String>();
         try (BufferedReader bufferedReader = new BufferedReader(inputStream)) {
             configSettingsLine = bufferedReader.readLine();
             Gson gson = new Gson();
             configInputs = gson.fromJson(String.valueOf(configSettingsLine), ConfigInputs.class);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Problem with the format of the config file.");
+            System.exit(1);
         }
         return configInputs;
     }

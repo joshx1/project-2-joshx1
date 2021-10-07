@@ -1,5 +1,11 @@
 package project2;
 
+/**
+ * The CS601BlockingQueue class is a blocking queue with put, poll and check is empty functionality.
+ * This is taken from the CS601 in class example at
+ * https://github.com/CS601-F21/code-examples/blob/main/Threads/src/main/java/concurrent/CS601BlockingQueue.java.
+ * @param <T>
+ */
 public class CS601BlockingQueue<T> {
 
     private T[] items;
@@ -41,40 +47,22 @@ public class CS601BlockingQueue<T> {
         }
     }
 
-    public synchronized T take() {
-        while(size == 0) {
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        T item = items[start];
-        start = (start+1)%items.length;
-        size--;
-        /*
-        If the queue was previously full and a new slot has now opened
-        notify any waiters in the put method.
-         */
-        if(size == items.length-1) {
-            this.notifyAll();
-        }
-        return item;
-    }
-
+    /**
+     * The poll method takes an item off the top of the queue. If the queue is empty then the poll method will wait
+     * for 1000 milliseconds and if the queue remains empty then it will return null.
+     * @return
+     */
     public synchronized T poll() {
         boolean flag = false;
         if (size == 0) {
-            //System.out.println("returned null");
             try {
                 this.wait(1000);
                     if (size != 0) {
                         flag = true;
                     }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("Issue with the broker blocking queue.");
+                System.exit(1);
             }
         }
         if (size != 0 || flag == true) {
@@ -96,8 +84,5 @@ public class CS601BlockingQueue<T> {
 
     public synchronized boolean isEmpty() {
         return size == 0;
-    }
-
-    public static void main(String[] args) {
     }
 }

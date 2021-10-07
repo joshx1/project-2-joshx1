@@ -55,6 +55,8 @@ public class AmazonPublishSubscribe {
         broker.subscribe(amazonSubscriberOld2);
         broker.subscribe(amazonSubscriberNew1);
         broker.subscribe(amazonSubscriberNew2);
+
+        // A thread is created for publisher1.
         Thread publisherThread1 = new Thread() {
             public void run() {
                 Publisher publisher1 = null;
@@ -75,6 +77,8 @@ public class AmazonPublishSubscribe {
                 }
             }
         };
+
+        // A thread is created for publisher1.
         Thread publisherThread2 = new Thread() {
             public void run() {
                 Publisher publisher2 = null;
@@ -95,8 +99,10 @@ public class AmazonPublishSubscribe {
                 }
             }
         };
+
         publisherThread1.start();
         publisherThread2.start();
+
         try {
             publisherThread1.join(10000000);
         } catch (InterruptedException e) {
@@ -110,6 +116,7 @@ public class AmazonPublishSubscribe {
             System.out.println("Problem with running publisher.");
             System.exit(1);
         }
+
         broker.shutdown();
         amazonSubscriberOld1.shutdown();
         amazonSubscriberOld2.shutdown();

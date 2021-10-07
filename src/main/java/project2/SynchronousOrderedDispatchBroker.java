@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *     Ordered - The Broker guarantees that items from different publishers may not interleave.
  *     If a publisher is delivering to subscribers the next publisher must block until the first
  *     has finished.
+ *     Description taken from: https://github.com/CS601-F21/Project2
  *     Referenced https://examples.javacodegeeks.com/core-java/util/concurrent/locks-concurrent/readwritelock/java-readwritelock-example/
   */
 public class SynchronousOrderedDispatchBroker <T> implements Broker <T> {
@@ -50,6 +51,10 @@ public class SynchronousOrderedDispatchBroker <T> implements Broker <T> {
         }
     }
 
+    /**
+     * The subscribe method adds a given subscriber to the subscriber list.
+     * @param subscriber
+     */
     @Override
     public void subscribe(Subscriber<T> subscriber) {
         if (running) {
@@ -62,6 +67,9 @@ public class SynchronousOrderedDispatchBroker <T> implements Broker <T> {
         }
     }
 
+    /**
+     * The shutdown method shuts this broker down.
+     */
     @Override
     public void shutdown() {
         running = false;

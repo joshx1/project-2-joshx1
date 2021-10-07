@@ -1,21 +1,27 @@
 package project2;
 
 import com.google.gson.Gson;
-
 import java.io.*;
-import java.util.ArrayList;
 
+/**
+ * The AmazonSubscriber class implements the Subscriber interface for the Amazon reviews test application. It contains
+ * all functionality of the subscribers which includes subscribing, receiving publications and shutting down.
+ * @param <T>
+ */
 public class AmazonSubscriber<T> implements Subscriber <T>{
 
-    private ArrayList<T> inbox;
     private int UNIX_REVIEW_TIME_SPLIT = 1362268800;
     Gson gson = new Gson();
     BufferedWriter bufferedWriter;
     private String outputFileName;
     String oldOrNew;
 
+    /**
+     * The constructor for the AmazonSubscriber class.
+     * @param outputFileName
+     * @param oldOrNew
+     */
     public AmazonSubscriber(String outputFileName, String oldOrNew) {
-        this.inbox = new ArrayList<T>();
         this.outputFileName =  outputFileName;
         this.oldOrNew = oldOrNew;
         try {
@@ -29,9 +35,14 @@ public class AmazonSubscriber<T> implements Subscriber <T>{
         }
     }
 
+    /**
+     * The onEvent method is called when an item is published. Depeinding upon the subscriber type and the unix review
+     * time of the published review, this method will or will not write the item to the subscribers' respective output
+     * file.
+     * @param item
+     */
     @Override
     public void onEvent(T item) {
-        //inbox.add(item);
         ReviewInputs reviewInputs = gson.fromJson(String.valueOf(item), ReviewInputs.class);
         int time = Integer.parseInt(reviewInputs.getUnixReviewTime());
         if (oldOrNew.equals("NEW")) {
@@ -55,6 +66,9 @@ public class AmazonSubscriber<T> implements Subscriber <T>{
         }
     }
 
+    /**
+     * This shutdown method closes the BufferedWriter.
+     */
     public synchronized void shutdown() {
         try {
             bufferedWriter.close();

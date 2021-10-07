@@ -7,6 +7,14 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * The AsynchronousUnorderedDispatchBroker class implements the Broker interface and has the following properties:
+ *     Asynchronous - A newly published item will be asynchronously delivered to all subscribers. The publish method
+ *     will return to the publisher immediately, and the item will be delivered to the subscribers after the publish
+ *     method completes.
+ *     Unordered - The Broker makes no guarantees about the order in which items are delivered to the subscribers.
+ *     Description taken from: https://github.com/CS601-F21/Project2
+ */
 public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
 
     private ArrayList<Subscriber> subscriberList;
@@ -17,7 +25,7 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
     private ExecutorService threadPool;
 
     /**
-     * Constructor for AsyncUnorderedDispatchBroker.
+     * Constructor for AsyncUnorderedDispatchBroker. A threadpool with 5 threads is created.
      * @param subscriberList
      */
     public AsyncUnorderedDispatchBroker(ArrayList<Subscriber> subscriberList) {
@@ -25,6 +33,10 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
         this.threadPool = Executors.newFixedThreadPool(5);
     }
 
+    /**
+     * The publish method publishes an item and delivers the item to all subscribers.
+     * @param item
+     */
     @Override
     public void publish(T item) {
         threadPool.execute(new Runnable() {
@@ -32,7 +44,6 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
             public void run() {
                 readLock.lock();
                 try {
-                    //subscriberList.forEach((subscriber) -> subscriber.onEvent(item));
                     for (int k = 0; k < subscriberList.size(); k++) {
                         Subscriber subscriber = subscriberList.get(k);
                         synchronized (subscriber) {
@@ -46,6 +57,10 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
         });
     }
 
+    /**
+     * The subscribe method adds a given subscriber to the subscriber list.
+     * @param subscriber
+     */
     @Override
     public void subscribe(Subscriber<T> subscriber) {
         writeLock.lock();
@@ -56,13 +71,18 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
         }
     }
 
+    /**
+     * The shutdown method shuts this broker down. The threadpool is shutdown and will give the remaining jobs a maximum
+     * of 10 hours to complete.
+     */
     @Override
     public void shutdown() {
         threadPool.shutdown();
         try {
             threadPool.awaitTermination(10, TimeUnit.HOURS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("Problem with the broker shutting down.");
+            System.exit(1);
         }
     }
 }

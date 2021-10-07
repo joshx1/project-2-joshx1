@@ -8,6 +8,16 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * The AsynchronousOrderedDispatchBroker class implements the Broker interface and has the following properties:
+ *     Asynchronous - A newly published item will be asynchronously delivered to all subscribers. The publish method
+ *     will return to the publisher immediately, and the item will be delivered to the subscribers after the publish
+ *     method completes.
+ *     Ordered - The Broker guarantees that items from different publishers may not interleave.
+ *     If a publisher is delivering to subscribers the next publisher must block until the first
+ *     has finished.
+ *     Description taken from: https://github.com/CS601-F21/Project2
+ */
 public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
 
     private ArrayList<Subscriber> subscriberList;
@@ -38,6 +48,10 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
         });
     }
 
+    /**
+     * The publish method publishes an item and delivers the item to all subscribers.
+     * @param item
+     */
     @Override
     public void publish(T item) {
         running = true;
@@ -49,6 +63,10 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
         }
     }
 
+    /**
+     * The subscribe method adds a given subscriber to the subscriber list.
+     * @param subscriber
+     */
     @Override
     public synchronized void subscribe(Subscriber<T> subscriber) {
         if (running) {
@@ -61,6 +79,10 @@ public class AsyncOrderedDispatchBroker <T> implements Broker <T> {
         }
     }
 
+    /**
+     * The shutdown method shuts this broker down. The mailer thread is a maximum of 10 hours to finish its remaining
+     * jobs.
+     */
     @Override
     public void shutdown() {
         mailer.shutdown();
