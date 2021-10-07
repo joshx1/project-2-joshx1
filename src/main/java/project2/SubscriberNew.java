@@ -1,17 +1,19 @@
 package project2;
+
 import com.google.gson.Gson;
 
 import java.io.*;
 import java.util.ArrayList;
 
-public class SubscriberOld <T> implements Subscriber <T>{
+public class SubscriberNew <T> implements Subscriber <T>{
+
     private ArrayList<T> inbox;
     private int UNIX_REVIEW_TIME_SPLIT = 1362268800;
     Gson gson = new Gson();
     BufferedWriter bufferedWriter;
     private String outputFileName;
 
-    public SubscriberOld(String outputFileName) {
+    public SubscriberNew(String outputFileName) {
         this.inbox = new ArrayList<T>();
         this.outputFileName =  outputFileName;
         try {
@@ -30,10 +32,10 @@ public class SubscriberOld <T> implements Subscriber <T>{
         //inbox.add(item);
         ReviewInputs reviewInputs = gson.fromJson(String.valueOf(item), ReviewInputs.class);
         int time = Integer.parseInt(reviewInputs.getUnixReviewTime());
-        if (time < UNIX_REVIEW_TIME_SPLIT) {
+        if (time >= UNIX_REVIEW_TIME_SPLIT) {
             try {
-                 bufferedWriter.write(String.valueOf(item));
-                 bufferedWriter.newLine();
+                bufferedWriter.write(String.valueOf(item));
+                bufferedWriter.newLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }

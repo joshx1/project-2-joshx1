@@ -22,7 +22,7 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
      */
     public AsyncUnorderedDispatchBroker(ArrayList<Subscriber> subscriberList) {
         this.subscriberList = subscriberList;
-        this.threadPool = Executors.newFixedThreadPool(1);
+        this.threadPool = Executors.newFixedThreadPool(5);
     }
 
     @Override
@@ -31,23 +31,22 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
         threadPool.execute(new Runnable() {
             @Override
             public void run() {
-                //readLock.lock();
-                //try {
+                readLock.lock();
+                try {
                 //    subscriberList.forEach((subscriber) -> subscriber.onEvent(item));
-                //} finally {
-                //    readLock.unlock();
-                //}
-                for (int k = 0; k < subscriberList.size(); k++) {
-                    //System.out.println(k);
-                    Subscriber subscriber = subscriberList.get(k);
-                    subscriber.onEvent(item);
+                    for (int k = 0; k < subscriberList.size(); k++) {
+                        Subscriber subscriber = subscriberList.get(k);
+                        subscriber.onEvent(item);
+                    }
+                } finally {
+                    readLock.unlock();
                 }
-            }
+           }
         });
     }
 
     @Override
-    public synchronized void subscribe(Subscriber<T> subscriber) {
+    public void subscribe(Subscriber<T> subscriber) {
         writeLock.lock();
         try {
             subscriberList.add(subscriber);

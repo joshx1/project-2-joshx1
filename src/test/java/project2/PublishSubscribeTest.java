@@ -24,14 +24,24 @@ class PublishSubscribeTest {
     SubscriberOld<String> subscriber3 = new SubscriberOld<>(outputFileName3);
     SynchronousOrderedDispatchBroker syncBroker = new SynchronousOrderedDispatchBroker(new ArrayList<>());
     AsyncUnorderedDispatchBroker asyncUnordBroker = new AsyncUnorderedDispatchBroker(new ArrayList<>());
-    //AsyncOrderedDispatchBroker asyncOrdBroker = new AsyncOrderedDispatchBroker(new ArrayList<>());
+    AsyncOrderedDispatchBroker asyncOrdBroker = new AsyncOrderedDispatchBroker(new ArrayList<>());
+
+    @Test
+    public void maintest() {
+        String[] args = {"-config", "config.json"};
+        final long startTime = System.currentTimeMillis();
+        PublishSubscribe publishSubscribe = null;
+        publishSubscribe.main(args);
+        final long endTime = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (endTime - startTime));
+    }
 
     @Test
     public void asynctestpublisherthreads() {
         final long startTime = System.currentTimeMillis();
-        asyncUnordBroker.subscribe(subscriber1);
-        asyncUnordBroker.subscribe(subscriber2);
-        asyncUnordBroker.subscribe(subscriber3);
+        asyncOrdBroker.subscribe(subscriber1);
+        asyncOrdBroker.subscribe(subscriber2);
+        asyncOrdBroker.subscribe(subscriber3);
         Thread publisherThread1 = new Thread() {
             public void run() {
                 Publisher publisher1 = null;
@@ -43,7 +53,7 @@ class PublishSubscribeTest {
                     exc.printStackTrace();
                 }
                 try {
-                    publisher1.callPublish(asyncUnordBroker);
+                    publisher1.callPublish(asyncOrdBroker);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -61,7 +71,7 @@ class PublishSubscribeTest {
                     exc.printStackTrace();
                 }
                 try {
-                    publisher2.callPublish(asyncUnordBroker);
+                    publisher2.callPublish(asyncOrdBroker);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -80,7 +90,7 @@ class PublishSubscribeTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        asyncUnordBroker.shutdown();
+        asyncOrdBroker.shutdown();
         subscriber1.shutdown();
         subscriber2.shutdown();
         subscriber3.shutdown();

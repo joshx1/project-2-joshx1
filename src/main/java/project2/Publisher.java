@@ -19,7 +19,6 @@ public class Publisher <T> {
 
     public void callPublish(Broker broker) throws IOException {
         try (BufferedReader bufferedReader = new BufferedReader(inputStream)) {
-            Gson gson = new Gson();
             String line = "";
             int lineNumber = 0;
             while (line != null) {

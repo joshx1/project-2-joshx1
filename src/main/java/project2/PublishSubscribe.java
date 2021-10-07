@@ -1,7 +1,11 @@
 package project2;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ExecutorService;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -9,48 +13,82 @@ import java.util.concurrent.TimeUnit;
 // aSyncUnordered - pool
 // ASyncOrdered - bounded blocking queue
 public class PublishSubscribe {
+
+    static Broker broker = null;
+
     public static void main(String[] args) {
-        String outputFileName = "KitchenOld.json";
-        SubscriberOld <String> subscriber1 = new SubscriberOld<>(outputFileName);
-        SubscriberOld <String> subscriber2 = new SubscriberOld<>(outputFileName);
-        SubscriberOld <String> subscriber3 = new SubscriberOld<>(outputFileName);
-        //SynchronousOrderedDispatchBroker broker = new SynchronousOrderedDispatchBroker(new ArrayList<>());
-        AsyncUnorderedDispatchBroker broker = new AsyncUnorderedDispatchBroker(new ArrayList<>());
-        //AsyncOrderedDispatchBroker broker = new AsyncOrderedDispatchBroker(new ArrayList<>());
-        broker.subscribe(subscriber1);
-        broker.subscribe(subscriber2);
-        broker.subscribe(subscriber3);
-        ExecutorService publisher1 = Executors.newSingleThreadExecutor();
-        ExecutorService publisher2 = Executors.newSingleThreadExecutor();
-        publisher1.execute(new Runnable() {
-            @Override
+        ReadConfigSettings readConfigSettings = new ReadConfigSettings(args);
+        ConfigInputs configInputs = readConfigSettings.extractConfigSettings();
+        SubscriberOld<String> subscriberOld1 = new SubscriberOld<>(configInputs.getOutputFileNameOld1());
+        SubscriberOld<String> subscriberOld2 = new SubscriberOld<>(configInputs.getOutputFileNameOld2());
+        SubscriberNew<String> subscriberNew1 = new SubscriberNew<>(configInputs.getOutputFileNameNew1());
+        SubscriberNew<String> subscriberNew2 = new SubscriberNew<>(configInputs.getOutputFileNameNew2());
+        if (configInputs.getBrokerType().equals("syncOrdered")) {
+            broker = new SynchronousOrderedDispatchBroker(new ArrayList<>());
+        } else if (configInputs.getBrokerType().equals("asyncUnordered")) {
+            broker = new AsyncUnorderedDispatchBroker(new ArrayList<>());
+        } else if (configInputs.getBrokerType().equals("asyncOrdered")) {
+            broker = new AsyncOrderedDispatchBroker(new ArrayList<>());
+        } else {
+            System.out.println("Broker config setting specified does not exist.");
+            System.exit(1);
+        }
+
+        broker.subscribe(subscriberOld1);
+        broker.subscribe(subscriberOld2);
+        broker.subscribe(subscriberNew1);
+        broker.subscribe(subscriberNew2);
+        Thread publisherThread1 = new Thread() {
             public void run() {
-                for (int i = 0; i < 10; i++) {
-                    broker.publish("0");
-                    System.out.println("AAA");
+                Publisher publisher1 = null;
+                try {
+                    publisher1 = new Publisher("reviews_Home_and_Kitchen_5.json");
+                } catch (UnsupportedEncodingException exc) {
+                    exc.printStackTrace();
+                } catch (FileNotFoundException exc) {
+                    exc.printStackTrace();
+                }
+                try {
+                    publisher1.callPublish(broker);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-        });
-        publisher2.execute(new Runnable() {
-            @Override
+        };
+        Thread publisherThread2 = new Thread() {
             public void run() {
-                for (int i = 0; i < 10; i++) {
-                    broker.publish("1");
-                    System.out.println("ZZZ");
+                Publisher publisher2 = null;
+                try {
+                    publisher2 = new Publisher("reviews_Apps_for_Android_5.json");
+                } catch (UnsupportedEncodingException exc) {
+                    exc.printStackTrace();
+                } catch (FileNotFoundException exc) {
+                    exc.printStackTrace();
+                }
+                try {
+                    publisher2.callPublish(broker);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-        });
-        publisher1.shutdown();
-        publisher2.shutdown();
+        };
+        publisherThread1.start();
+        publisherThread2.start();
         try {
-            publisher1.awaitTermination(10, TimeUnit.HOURS);
-            publisher2.awaitTermination(10, TimeUnit.HOURS);
+            publisherThread1.join(10000000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            publisherThread2.join(10000000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         broker.shutdown();
-        subscriber1.printInbox();
-        subscriber2.printInbox();
-        subscriber3.printInbox();
+        subscriberOld1.shutdown();
+        subscriberOld2.shutdown();
+        subscriberNew1.shutdown();
+        subscriberNew2.shutdown();
     }
 }
