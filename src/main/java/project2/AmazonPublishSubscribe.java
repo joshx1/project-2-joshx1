@@ -34,6 +34,7 @@ public class AmazonPublishSubscribe {
      * @param args
      */
     public static void main(String[] args) {
+        final long startTime = System.currentTimeMillis();
         ReadConfigSettings readConfigSettings = new ReadConfigSettings(args);
         ConfigInputs configInputs = readConfigSettings.extractConfigSettings();
         AmazonSubscriber<String> amazonSubscriberOld1 = new AmazonSubscriber<>(configInputs.getOutputFileNameOld1(), "OLD");
@@ -122,5 +123,8 @@ public class AmazonPublishSubscribe {
         amazonSubscriberOld2.shutdown();
         amazonSubscriberNew1.shutdown();
         amazonSubscriberNew2.shutdown();
+
+        final long endTime = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (endTime - startTime) + " milliseconds.");
     }
 }
