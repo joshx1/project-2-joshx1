@@ -37,12 +37,13 @@ public class AsyncUnorderedDispatchBroker <T> implements Broker <T>{
                     for (int k = 0; k < subscriberList.size(); k++) {
                         //System.out.println(k);
                         Subscriber subscriber = subscriberList.get(k);
-                        subscriber.onEvent(item);
+                        synchronized (subscriber) {
+                            subscriber.onEvent(item);
+                        }
                     }
                 } finally {
                     readLock.unlock();
                 }
-
             }
         });
     }

@@ -1,5 +1,6 @@
 package project2;
 
+import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -92,6 +93,7 @@ class PublishSubscribeTest {
         assertEquals(774871, newLineCount);
     }
 
+    //@RepeatedTest(100)
     @Test
     public void maintestasync() {
         String[] args = {"-config", "config.json"};
@@ -100,7 +102,6 @@ class PublishSubscribeTest {
         publishSubscribe.main(args);
         final long endTime = System.currentTimeMillis();
         System.out.println("Total execution time: " + (endTime - startTime));
-        System.exit(1);
         try {
             fileInputNew1 = new FileInputStream("reviewsNew1.json");
             inputStreamNew1 = new InputStreamReader(fileInputNew1, "ISO-8859-1");
@@ -115,41 +116,46 @@ class PublishSubscribeTest {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
+        Gson gson = new Gson();
         String line = "";
-        //HashMap<String, Integer> reviewMapOld = new HashMap<>();
-        //int oldLineCount = 0;
-        //try (BufferedReader bufferedReaderOld1 = new BufferedReader(inputStreamOld1)) {
-        //    while (line != null) {
-        //        line = bufferedReaderOld1.readLine();
-        //        if (line != null) {
-        //            reviewMapOld.put(line, reviewMapOld.getOrDefault(line, 0) + 1);
-        //            oldLineCount++;
-        //        }
-        //    }
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //}
-        //assertEquals(529748, oldLineCount);
+        HashMap<String, Integer> reviewMapOld = new HashMap<>();
+        int oldLineCount = 0;
+        try (BufferedReader bufferedReaderOld1 = new BufferedReader(inputStreamOld1)) {
+            while (line != null) {
+                line = bufferedReaderOld1.readLine();
+                if (line != null) {
+                    ReviewInputs reviewInputs= gson.fromJson(String.valueOf(line), ReviewInputs.class);
+                    reviewMapOld.put(reviewInputs.getAsin(), reviewMapOld.getOrDefault(reviewInputs.getAsin(), 0) + 1);
+                    oldLineCount++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertEquals(529748, oldLineCount);
 
-        //line = "";
-        //oldLineCount = 0;
-        //try (BufferedReader bufferedReaderOld2 = new BufferedReader(inputStreamOld2)) {
-        //    while (line != null) {
-        //        line = bufferedReaderOld2.readLine();
-        //        if (line != null) {
-        //            reviewMapOld.put(line, reviewMapOld.getOrDefault(line, 0) + 1);
-        //            oldLineCount++;
-        //        }
-        //    }
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //}
-        //for (HashMap.Entry<String, Integer> entry: reviewMapOld.entrySet()) {
-        //    int count = entry.getValue();
-        //    assertEquals(2, count);
-        //}
-        //assertEquals(529748, oldLineCount);
-
+        HashMap<String, Integer> reviewMapOld2 = new HashMap<>();
+        line = "";
+        oldLineCount = 0;
+        try (BufferedReader bufferedReaderOld2 = new BufferedReader(inputStreamOld2)) {
+            while (line != null) {
+                line = bufferedReaderOld2.readLine();
+                if (line != null) {
+                    ReviewInputs reviewInputs= gson.fromJson(String.valueOf(line), ReviewInputs.class);
+                    reviewMapOld2.put(reviewInputs.getAsin(), reviewMapOld2.getOrDefault(reviewInputs.getAsin(), 0) + 1);
+                    oldLineCount++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (HashMap.Entry<String, Integer> entry: reviewMapOld.entrySet()) {
+            String asin = entry.getKey();
+            assert(reviewMapOld.get(asin).equals(reviewMapOld2.get(asin)));
+        }
+        assertEquals(529748, oldLineCount);
+        //System.exit(1);
         line = "";
         int newLineCount = 0;
         HashMap<String, Integer> reviewMapNew = new HashMap<>();
@@ -165,7 +171,7 @@ class PublishSubscribeTest {
             e.printStackTrace();
         }
         assertEquals(774871, newLineCount);
-
+        newLineCount = 0;
         line = "";
         try (BufferedReader bufferedReaderNew2 = new BufferedReader(inputStreamNew2)) {
             while (line != null) {
